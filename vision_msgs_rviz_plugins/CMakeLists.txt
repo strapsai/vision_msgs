@@ -16,6 +16,15 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif()
 
 # find dependencies
+# Jetson images also contain a /usr/local Draco package that exports only
+# draco::draco. Ubuntu's Assimp (pulled in by RViz) needs draco_shared instead.
+# Override even a cached /usr/local selection before loading RViz dependencies.
+string(TOLOWER "${CMAKE_SYSTEM_PROCESSOR}" vision_msgs_target_processor)
+if(vision_msgs_target_processor MATCHES "^(aarch64|arm64)$")
+  set(draco_DIR "/usr/lib/aarch64-linux-gnu/cmake/draco"
+    CACHE PATH "System Draco configuration required by Ubuntu Assimp" FORCE)
+endif()
+
 find_package(Qt5 REQUIRED COMPONENTS Widgets Core)
 find_package(yaml_cpp_vendor REQUIRED)
 
